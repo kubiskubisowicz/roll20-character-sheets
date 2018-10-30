@@ -12939,6 +12939,45 @@
         });
     });
 
+    //DEV-628
+    /* BIO PAGE */
+    on("page:l1-bio", function(eventinfo) {
+        var race = getName("race");
+        var previousRace = getName("previous_race");
+        changeCompendiumPage("sheet-race-info", race);
+        console.log(eventinfo);
+        console.log(race);
+
+        //Save and exit Data is not saving
+
+        //Check for any data that has already been filled in and populate the Bio slide
+        var data = getCharmancerData();
+        if (data["l1-bio"] === undefined) {
+            const attrs = ["age", "character_name", "eyes", "hair", "height", "weight", "skin"];
+            getAttrs(attrs, function(v) {
+                let update = {};
+
+                _.each(attrs, function(value) {
+                    if (v[`${value}`] === "" || v[`${value}`] === undefined) {
+                        return undefined;
+                    } else {
+                        update[`${value}`] = v[`${value}`];
+                    };
+                });
+
+                console.log(update); // Remove later
+                setAttrs(update);
+            });
+        } else {
+            console.log("DATA WAS ALREADY HERE!!");
+        };
+    });
+
+    on("mancerchange:race", function(eventinfo) {
+        console.log(eventinfo);
+    });
+
+    /* SUMMARY PAGE */
     on("page:l1-summary", function() {
         var mancerdata = getCharmancerData();
         var profdata = getProficiencies(mancerdata);
@@ -13041,16 +13080,47 @@
         if(mancerdata["l1-bio"]) {
             console.log("MANCER BIO DATA!!!");
             console.log(mancerdata["l1-bio"].values);
-            if(mancerdata["l1-bio"].values.character_name == undefined) {
-                set["bio_info"] = '<p>You have not entered a name.</p>';
+            set["bio_info"] = "";
+            if(mancerdata["l1-bio"].values.character_name){
+                set["bio_info"] += '<p>Your name is ' + mancerdata["l1-bio"].values.character_name + '.</p>';
             } else {
-                set["bio_info"] = '<p>Your name is ' + mancerdata["l1-bio"].values.character_name + '.</p>';
+                set["bio_info"] += '<p>You have not entered a new name.</p>';
             };
-            if(mancerdata["l1-bio"].values.age){set["bio_info"] += '<p>Your age is ' + mancerdata["l1-bio"].values.age + '.</p>';}
-            if(mancerdata["l1-bio"].values.eyes){set["bio_info"] += '<p>Your eye color is ' + mancerdata["l1-bio"].values.eyes + '.</p>';}
-            if(mancerdata["l1-bio"].values.hair){set["bio_info"] += '<p>Your hair is ' + mancerdata["l1-bio"].values.hair + '.</p>';}
-            if(mancerdata["l1-bio"].values["height"]){set["bio_info"] += '<p>Your height is ' + mancerdata["l1-bio"].values["height"] + '.</p>';}
-            if(mancerdata["l1-bio"].values.weight){set["bio_info"] += '<p>Your weight is ' + mancerdata["l1-bio"].values.weight + '.</p>';}
+            if(mancerdata["l1-bio"].values.age) {
+                set["bio_info"] += '<p>Your age is ' + mancerdata["l1-bio"].values.age + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered an age.</p>';
+            };
+            
+            if(mancerdata["l1-bio"].values["height"]) {
+                set["bio_info"] += '<p>Your height is ' + mancerdata["l1-bio"].values["height"] + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered a height.</p>';
+            };
+            
+            if(mancerdata["l1-bio"].values.weight) {
+                set["bio_info"] += '<p>Your weight is ' + mancerdata["l1-bio"].values.weight + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered a weight.</p>';
+            };
+            
+            if(mancerdata["l1-bio"].values.eyes) {
+                set["bio_info"] += '<p>Your eye color is ' + mancerdata["l1-bio"].values.eyes + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered an eye color.</p>';
+            };
+            
+            if(mancerdata["l1-bio"].values.hair) {
+                set["bio_info"] += '<p>Your hair is ' + mancerdata["l1-bio"].values.hair + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered a hair color.</p>';
+            };
+            
+            if(mancerdata["l1-bio"].values.skin) {
+                set["bio_info"] += '<p>Your skin is ' + mancerdata["l1-bio"].values.skin + '.</p>';
+            } else {
+                set["bio_info"] += '<p>You have not entered a skin tone.</p>';
+            };
         };
 
         if(mancerdata["l1-race"] && racename) {
@@ -13529,7 +13599,7 @@
         var silentset = {};
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
         var clearset = {};
-        var clearattrs = ["age", "hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
+        var clearattrs = ["hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
         var set = {gp: 0};
         var allDrops = [];
         var currentDrop = 0;
@@ -13734,7 +13804,6 @@
 
         //Set up the final setAttrs()
         set["alignment"] = data["l1-race"].values.alignment || "";
-        //DEV-628 set["age"] = data["l1-race"].values.age || "";
         set["hp"] = stats.hp;
         set["hp_max"] = stats.hp;
         set["l1mancer_status"] = "completed";
@@ -13748,6 +13817,12 @@
         } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
             set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
         }
+         //Set the bio info DEV-628
+        _.each(["character_name", "age", "height", "weight", "eyes", "hair", "skin"], function(type) {
+            if(data["l1-bio"].values[type]) {
+                set[type] = data["l1-bio"].values[type] || "";
+            }
+        });
         //Add skill proficiencies
         _.each(_.uniq(profs.all.Skill.concat(profs.all.Expertise)), function(prof) {
             var profName = prof.toLowerCase().replace(" " , "_");
@@ -14919,6 +14994,7 @@
         </ol>
         <div class="topbar-holder"></div>
         <div class="choices">
+            <input type="hidden" name="comp_previous_race">
             <div>
                 <div class="row">
                     <label><span data-i18n="name">Name:</span>
